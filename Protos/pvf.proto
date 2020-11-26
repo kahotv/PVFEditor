@@ -1,0 +1,129 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+option csharp_namespace = "PVFServices";
+
+service Pvf{
+	rpc TestConnect		(google.protobuf.Empty)	returns (google.protobuf.Empty);	//连接测试
+	rpc CreateContext	(CreateContextRequest)	returns (CreateContextReply);		//创建Context
+	rpc CloseContext	(CloseContextRequest)	returns (CloseContextReply);		//关闭Context
+	rpc GetContext		(GetContextRequest)		returns (GetContextReply);			//获取Context信息
+	rpc ExpandPath		(ExpandPathRequest)		returns (ExpandPathReply);			//展开目录
+	rpc ReadScript		(ReadScriptRequest)		returns (ReadScriptReply);			//读取文件
+	rpc WriteScript		(WriteScriptRequest)	returns (WriteScriptReply);			//写入文件
+	rpc CancelScript	(CancelScriptRequest)	returns (CancelScriptReply);		//删除写入
+	rpc ReadScriptOld	(ReadScriptOldRequest)	returns (ReadScriptOldReply);		//读取原文件
+	rpc SearchScript	(SearchScriptRequest)	returns (SearchScriptReply);		//搜索文件
+	rpc GetPatchData	(google.protobuf.Empty) returns (GetPatchDataReply);		//生成补丁文件
+	rpc PSkill			(google.protobuf.Empty) returns (PSkillReply);				//PSkill
+	rpc PSY				(google.protobuf.Empty) returns (PSYReply);					//PSY
+}
+
+message CreateContextRequest{
+}
+message CreateContextReply {
+}
+
+message CloseContextRequest{
+}
+message CloseContextReply{
+}
+
+message EditFileInfo{
+	int32 id = 1;
+	string path = 2;
+	string name = 3;
+	string createdate = 5;
+	string lastdate = 6;
+}
+
+message MFileInfo{
+	int32 id = 1;
+	string path = 2;
+	string name = 3;
+}
+
+
+message GetContextRequest{
+}
+message GetContextReply{
+	bool editing = 1;					//是否处于编辑中
+	string guid = 2;					//PVF编号
+	string packtime = 3;				//打包时间
+	int32 filecount = 4;				//文件总数
+	repeated EditFileInfo infos = 5;	//改动的文件列表
+}
+
+message ExpandPathInfo{
+	int32 fileid = 1;
+	string name = 2;
+}
+
+message ExpandPathRequest{
+	string Path = 1;
+}
+message ExpandPathReply{
+	repeated ExpandPathInfo Infos = 1;
+}
+
+message ReadScriptRequest{
+	int32 fileid = 1;		//文件ID
+}
+message ReadScriptReply{
+	string script = 1;		//文件内容
+	string nametag = 2;
+}
+
+message WriteScriptRequest{
+	int32 fileid = 1;		//id，首选
+	string path = 2;		//路径+名称
+	string script = 3;		//文件内容
+}
+message WriteScriptReply{
+}
+
+message CancelScriptRequest{
+	int32 fileid = 1;
+}
+message CancelScriptReply{
+}
+
+message ReadScriptOldRequest{
+	int32 fileid = 1;		//文件ID
+}
+message ReadScriptOldReply{
+	string script = 1;		//文件内容
+	string nametag = 2;
+}
+
+
+
+message SearchScriptRequest{
+	enum SearchType{
+		equ = 0;		//装备
+		dgn = 1;		//副本
+		mob = 2;		//怪物
+		qst = 3;		//任务
+		stk = 4;		//物品
+		skl = 5;		//技能
+	}
+	SearchType type = 1;	//搜索类型
+	string txt = 2;			//搜索内容，|隔开
+	bool bpath = 3;	//搜索路径
+}
+message SearchScriptReply{
+	repeated MFileInfo Infos = 1;
+}
+
+message GetPatchDataReply{
+	bytes Data =1;
+}
+
+message PSkillReply{
+	int32 count = 1;
+}
+
+message PSYReply{
+	int32 count = 1;
+}
