@@ -23,10 +23,10 @@ namespace PVFEditor
             try
             {
                 LoginServicesClient.Login(tbName.Text, tbPwd.Text);
-                PvfServicesClient.Init(LoginServicesClient.GetHttpClient(), errmsg =>
-                 {
-                     MessageBox.Show(errmsg);
-                 });
+                PvfServicesClient.Init(errmsg =>
+                {
+                    MessageBox.Show(errmsg);
+                },LoginServicesClient.GetHttpClient());
 
 
                 this.Hide();

@@ -19,9 +19,14 @@ namespace PVFEditor
     public partial class FormMain : Form
     {
         StateInfo _stateinfo = new StateInfo();
-        SaveFileDialog m_fsave = new SaveFileDialog() { Title = "请选择要打补丁的PVF", Filter = "PVF文件(*.pvf)|*.pvf|所有文件(*.*)|*.*", RestoreDirectory = true };
-        FolderBrowserDialog m_floder = new FolderBrowserDialog() { ShowNewFolderButton = true };
-        FolderBrowserDialog m_floder_import = new FolderBrowserDialog() { ShowNewFolderButton = false, Description = "选择需合并的PVF跟目录" };
+        SaveFileDialog m_fsave_pathfile = new SaveFileDialog() 
+        { Title = "请选择保存路径", Filter = "PVF补丁文件(*.ppatch)|*.ppatch|所有文件(*.*)|*.*", RestoreDirectory = true };
+        SaveFileDialog m_fsave = new SaveFileDialog() 
+        { Title = "请选择要打补丁的PVF", Filter = "PVF文件(*.pvf)|*.pvf|所有文件(*.*)|*.*", RestoreDirectory = true };
+        FolderBrowserDialog m_floder = new FolderBrowserDialog() 
+        { ShowNewFolderButton = true };
+        FolderBrowserDialog m_floder_import = new FolderBrowserDialog() 
+        { ShowNewFolderButton = false, Description = "选择需合并的PVF跟目录" };
 
         bool _editing = false;
         bool Editing
@@ -49,6 +54,13 @@ namespace PVFEditor
         public FormMain()
         {
             InitializeComponent();
+
+            PVFEditor.Services.PvfServicesClient.Init(errmsg =>
+            {
+                MessageBox.Show(errmsg);
+            });
+
+            this.Text = this.Text + " " + PVFEditor.Services.LoginServicesClient.GetUserName();
 
             InitStaticResource();
             InitMenusEvent();
@@ -98,15 +110,21 @@ namespace PVFEditor
 
         private void MenuFileClose_Click(object sender, EventArgs e)
         {
-            pvf.CloseContext(new CloseContextRequest());
-            InitState();
-            CheckEditState();
+            var r = MessageBox.Show("将会清空已修改的文件，是否关闭？", "警告", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+            if(r == DialogResult.OK)
+            {
+                pvf.CloseContext(new CloseContextRequest());
+                InitState();
+                CheckEditState();
+            }
         }
 
         private void MenuFileOpen_Click(object sender, EventArgs e)
         {
             pvf.CreateContext(new CreateContextRequest());
             CheckEditState();
+
+            MessageBox.Show("首次使用请查看帮助");
         }
 
         private PVFServices.Pvf.PvfClient pvf =>
@@ -119,16 +137,26 @@ namespace PVFEditor
             {
                 menuFileOpen.Enabled = false;
                 menuFileClose.Enabled = true;
-                menuFileExportPatch.Enabled = true;
+                menuFilePatch.Enabled = true;
+                menuFileExportPatchFile.Enabled = true;
                 panel_search.Enabled = true;
+
+                menuEdit.Enabled = true;
+                menuTool.Enabled = true;
+
                 ShowDirTree();
             }
             else
             {
                 menuFileOpen.Enabled = true;
                 menuFileClose.Enabled = false;
-                menuFileExportPatch.Enabled = false;
+                menuFilePatch.Enabled = false;
+                menuFileExportPatchFile.Enabled = false;
                 panel_search.Enabled = false;
+
+                menuEdit.Enabled = false;
+                menuTool.Enabled = false;
+
                 CloseDirTree();
             }
         }
@@ -159,11 +187,14 @@ namespace PVFEditor
             menuFileOpen.Click += MenuFileOpen_Click;           //打开Context
             menuFileClose.Click += MenuFileClose_Click;         //关闭Context
             menuEditDelete.Click += MenuEditDelete_Click;       //删除修改
-            menuFileExportPatch.Click += MenuFileExportPatch_Click;
-            menuEditPSkill.Click += MenuEditPSkill_Click;
-            menuEditPSY.Click += MenuEditPSY_Click;
-            menuEditImport.Click += MenuEditImport_Click;
-
+            menuFilePatch.Click += MenuFileExportPatch_Click;   //对文件打补丁
+            menuFileExportPatchFile.Click += MenuFileExportPatchFile_Click;     //导出补丁文件
+            menuEditPSkill.Click += MenuEditPSkill_Click;       //增强所有技能
+            menuEditPSY.Click += MenuEditPSY_Click;             //增强圣耀武器
+            menuEditImport.Click += MenuEditImport_Click;       //合并目录
+            menuEditPEqu.Click += MenuEditPEqu_Click;           //处理所有装备
+            menuAboutMain.Click += MenuAboutMain_Click;         //关于
+            menuHelp.Click += MenuAboutHelp_Click;              //帮助
 
             tvAll.BeforeExpand += TvAll_BeforeExpand;                           //动态加载
 
@@ -173,6 +204,89 @@ namespace PVFEditor
             tvSearch.NodeMouseDoubleClick += TvAll_NodeMouseDoubleClick;         //树形列表双击
         }
 
+        private void MenuAboutHelp_Click(object sender, EventArgs e)
+        {
+            new FormHelp().ShowDialog();
+        }
+
+        private void MenuAboutMain_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("测试版 仅能修改2个文件，并限制部分功能");
+        }
+
+        //对PVF打补丁
+        private void MenuFileExportPatch_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("必须选择原版pvf\n耗时较长，请耐心等待！");
+
+            //选择PVF文件
+            DialogResult dr = m_fsave.ShowDialog();
+            if (dr != System.Windows.Forms.DialogResult.OK)
+            {
+                return;
+            }
+
+            var source = File.ReadAllBytes(m_fsave.FileName);
+
+            var r = pvf.GetPatchData(new Google.Protobuf.WellKnownTypes.Empty());
+            var patch = r.Data.ToArray();
+
+            var patchDec = Util.deCompressBytes(patch, 0, patch.Length);
+
+            var target = xdelta3.net.Xdelta3Lib.Decode(source, patchDec);
+
+            string filetarget = Path.Combine(
+                Path.GetDirectoryName(m_fsave.FileName),
+                Path.GetFileNameWithoutExtension(m_fsave.FileName) +
+                DateTime.Now.ToString("yyyyMMddHHmmss") + ".pvf");
+            using (FileStream fs = new FileStream(filetarget, FileMode.Create))
+            {
+                fs.Write(target.ToArray(), 0, target.Length);
+            }
+
+            MessageBox.Show("导出成功:" + filetarget);
+        }
+        //导出补丁文件
+        private void MenuFileExportPatchFile_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("耗时较长，请耐心等待！");
+
+            DialogResult dr = m_fsave_pathfile.ShowDialog();
+            if (dr != System.Windows.Forms.DialogResult.OK)
+            {
+                return;
+            }
+
+
+            var r = pvf.GetPatchData(new Google.Protobuf.WellKnownTypes.Empty());
+            var patch = r.Data.ToArray();
+
+            var patchDec = Util.deCompressBytes(patch, 0, patch.Length);
+            string filetarget = Path.Combine(
+                Path.GetDirectoryName(m_fsave_pathfile.FileName),
+                Path.GetFileNameWithoutExtension(m_fsave_pathfile.FileName) + ".ppatch");
+            using (FileStream fs = new FileStream(filetarget, FileMode.Create))
+            {
+                fs.Write(patchDec, 0, patchDec.Length);
+            }
+
+            MessageBox.Show("导出成功:" + filetarget);
+        }
+
+        //处理所有装备
+        private void MenuEditPEqu_Click(object sender, EventArgs e)
+        {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            var r = pvf.PEqu(new Empty());
+            if (r != null)
+            {
+                sw.Stop();
+                MessageBox.Show($"处理完成，共{r.Count}文件，耗时{sw.ElapsedMilliseconds}ms");
+                CheckEditState();
+            }
+        }
+        //合并目录
         private void MenuEditImport_Click(object sender, EventArgs e)
         {
             var res = m_floder_import.ShowDialog();
@@ -236,37 +350,6 @@ namespace PVFEditor
                 MessageBox.Show($"处理完成，共{r.Count}文件，耗时{sw.ElapsedMilliseconds}ms");
                 CheckEditState();
             }
-        }
-
-        //对PVF打补丁
-        private void MenuFileExportPatch_Click(object sender, EventArgs e)
-        {
-            //选择PVF文件
-            DialogResult dr = m_fsave.ShowDialog();
-            if (dr != System.Windows.Forms.DialogResult.OK)
-            {
-                return;
-            }
-
-            var source = File.ReadAllBytes(m_fsave.FileName);
-
-            var r = pvf.GetPatchData(new Google.Protobuf.WellKnownTypes.Empty());
-            var patch = r.Data.ToArray();
-
-            var patchDec = Util.deCompressBytes(patch, 0, patch.Length);
-            
-            var target = xdelta3.net.Xdelta3Lib.Decode(source, patchDec);
-
-            string filetarget = Path.Combine(
-                Path.GetDirectoryName(m_fsave.FileName),
-                Path.GetFileNameWithoutExtension(m_fsave.FileName) + 
-                DateTime.Now.ToString("yyyyMMddHHmmss") + ".pvf");
-            using (FileStream fs = new FileStream(filetarget, FileMode.Create))
-            {
-                fs.Write(target.ToArray(), 0, target.Length);
-            }
-
-            MessageBox.Show("导出成功:" + filetarget);
         }
 
         private void tvEditing_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
@@ -552,10 +635,14 @@ namespace PVFEditor
                 //是文件，就读取
                 tbScript.Enabled = false;
                 var r = pvf.ReadScript(new ReadScriptRequest() { Fileid = fileid });
-                tbScript.Text = r.Script;
-                tbScript.Enabled = true;
-                tbFilePath.Text = path;
-                _stateinfo.NameTag = FixTagName(r.Nametag);
+                if(r != null)
+                {
+                    tbScript.Text = r.Script;
+                    tbScript.Enabled = true;
+                    tbFilePath.Text = path;
+                    _stateinfo.NameTag = FixTagName(r.Nametag);
+                }
+
                 pg.Refresh();
             }
         }

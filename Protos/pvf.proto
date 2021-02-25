@@ -16,8 +16,9 @@ service Pvf{
 	rpc ReadScriptOld	(ReadScriptOldRequest)	returns (ReadScriptOldReply);		//读取原文件
 	rpc SearchScript	(SearchScriptRequest)	returns (SearchScriptReply);		//搜索文件
 	rpc GetPatchData	(google.protobuf.Empty) returns (GetPatchDataReply);		//生成补丁文件
-	rpc PSkill			(google.protobuf.Empty) returns (PSkillReply);				//PSkill
-	rpc PSY				(google.protobuf.Empty) returns (PSYReply);					//PSY
+	rpc PSkill			(google.protobuf.Empty) returns (PSkillReply);				//处理所有技能
+	rpc PSY				(google.protobuf.Empty) returns (PSYReply);					//处理圣耀武器
+	rpc PEqu			(google.protobuf.Empty) returns (PEquReply);				//处理所有装备
 }
 
 message CreateContextRequest{
@@ -125,5 +126,9 @@ message PSkillReply{
 }
 
 message PSYReply{
+	int32 count = 1;
+}
+
+message PEquReply{
 	int32 count = 1;
 }

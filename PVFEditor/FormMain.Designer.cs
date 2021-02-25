@@ -38,16 +38,19 @@ namespace PVFEditor
             this.menuFileOpen = new System.Windows.Forms.ToolStripMenuItem();
             this.menuFileClose = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.menuFileExportPatch = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuFilePatch = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuFileExportPatchFile = new System.Windows.Forms.ToolStripMenuItem();
             this.menuEdit = new System.Windows.Forms.ToolStripMenuItem();
             this.menuEditItem = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.menuEditImport = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.menuEditPSkill = new System.Windows.Forms.ToolStripMenuItem();
             this.menuEditPSY = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuEditPEqu = new System.Windows.Forms.ToolStripMenuItem();
             this.menuTool = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.menuAbout = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuAbotItem = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.menuAboutItem = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.menuAboutMain = new System.Windows.Forms.ToolStripMenuItem();
             this.panel2 = new System.Windows.Forms.Panel();
             this.panel3 = new System.Windows.Forms.Panel();
@@ -85,7 +88,7 @@ namespace PVFEditor
             this.menuStrip1.SuspendLayout();
             this.menuFileItem.SuspendLayout();
             this.menuEditItem.SuspendLayout();
-            this.menuAbotItem.SuspendLayout();
+            this.menuAboutItem.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -121,6 +124,7 @@ namespace PVFEditor
             this.menuFile,
             this.menuEdit,
             this.menuTool,
+            this.menuHelp,
             this.menuAbout});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
@@ -141,33 +145,40 @@ namespace PVFEditor
             this.menuFileOpen,
             this.menuFileClose,
             this.toolStripSeparator1,
-            this.menuFileExportPatch});
+            this.menuFilePatch,
+            this.menuFileExportPatchFile});
             this.menuFileItem.Name = "menuFileOpen";
             this.menuFileItem.OwnerItem = this.menuFile;
-            this.menuFileItem.Size = new System.Drawing.Size(125, 76);
+            this.menuFileItem.Size = new System.Drawing.Size(149, 98);
             // 
             // menuFileOpen
             // 
             this.menuFileOpen.Name = "menuFileOpen";
-            this.menuFileOpen.Size = new System.Drawing.Size(124, 22);
+            this.menuFileOpen.Size = new System.Drawing.Size(148, 22);
             this.menuFileOpen.Text = "打开";
             // 
             // menuFileClose
             // 
             this.menuFileClose.Name = "menuFileClose";
-            this.menuFileClose.Size = new System.Drawing.Size(124, 22);
+            this.menuFileClose.Size = new System.Drawing.Size(148, 22);
             this.menuFileClose.Text = "关闭";
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(121, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(145, 6);
             // 
-            // menuFileExportPatch
+            // menuFilePatch
             // 
-            this.menuFileExportPatch.Name = "menuFileExportPatch";
-            this.menuFileExportPatch.Size = new System.Drawing.Size(124, 22);
-            this.menuFileExportPatch.Text = "导出补丁";
+            this.menuFilePatch.Name = "menuFilePatch";
+            this.menuFilePatch.Size = new System.Drawing.Size(148, 22);
+            this.menuFilePatch.Text = "打补丁";
+            // 
+            // menuFileExportPatchFile
+            // 
+            this.menuFileExportPatchFile.Name = "menuFileExportPatchFile";
+            this.menuFileExportPatchFile.Size = new System.Drawing.Size(148, 22);
+            this.menuFileExportPatchFile.Text = "导出补丁文件";
             // 
             // menuEdit
             // 
@@ -182,10 +193,11 @@ namespace PVFEditor
             this.menuEditImport,
             this.toolStripSeparator2,
             this.menuEditPSkill,
-            this.menuEditPSY});
+            this.menuEditPSY,
+            this.menuEditPEqu});
             this.menuEditItem.Name = "menuEditItem";
             this.menuEditItem.OwnerItem = this.menuEdit;
-            this.menuEditItem.Size = new System.Drawing.Size(149, 76);
+            this.menuEditItem.Size = new System.Drawing.Size(149, 98);
             // 
             // menuEditImport
             // 
@@ -210,26 +222,38 @@ namespace PVFEditor
             this.menuEditPSY.Size = new System.Drawing.Size(148, 22);
             this.menuEditPSY.Text = "增强圣耀武器";
             // 
+            // menuEditPEqu
+            // 
+            this.menuEditPEqu.Name = "menuEditPEqu";
+            this.menuEditPEqu.Size = new System.Drawing.Size(148, 22);
+            this.menuEditPEqu.Text = "处理所有装备";
+            // 
             // menuTool
             // 
             this.menuTool.Name = "menuTool";
             this.menuTool.Size = new System.Drawing.Size(44, 21);
             this.menuTool.Text = "工具";
             // 
+            // menuHelp
+            // 
+            this.menuHelp.Name = "menuHelp";
+            this.menuHelp.Size = new System.Drawing.Size(44, 21);
+            this.menuHelp.Text = "帮助";
+            // 
             // menuAbout
             // 
-            this.menuAbout.DropDown = this.menuAbotItem;
+            this.menuAbout.DropDown = this.menuAboutItem;
             this.menuAbout.Name = "menuAbout";
             this.menuAbout.Size = new System.Drawing.Size(44, 21);
             this.menuAbout.Text = "关于";
             // 
-            // menuAbotItem
+            // menuAboutItem
             // 
-            this.menuAbotItem.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuAboutItem.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuAboutMain});
-            this.menuAbotItem.Name = "contextMenuStrip1";
-            this.menuAbotItem.OwnerItem = this.menuAbout;
-            this.menuAbotItem.Size = new System.Drawing.Size(137, 26);
+            this.menuAboutItem.Name = "contextMenuStrip1";
+            this.menuAboutItem.OwnerItem = this.menuAbout;
+            this.menuAboutItem.Size = new System.Drawing.Size(137, 26);
             // 
             // menuAboutMain
             // 
@@ -606,7 +630,7 @@ namespace PVFEditor
             this.menuStrip1.PerformLayout();
             this.menuFileItem.ResumeLayout(false);
             this.menuEditItem.ResumeLayout(false);
-            this.menuAbotItem.ResumeLayout(false);
+            this.menuAboutItem.ResumeLayout(false);
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
             this.panel3.ResumeLayout(false);
@@ -644,7 +668,7 @@ namespace PVFEditor
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem2;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem3;
         private System.Windows.Forms.ToolStripMenuItem menuFileClose;
-        private System.Windows.Forms.ToolStripMenuItem menuFileExportPatch;
+        private System.Windows.Forms.ToolStripMenuItem menuFilePatch;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.TextBox tbFilePath;
@@ -681,9 +705,12 @@ namespace PVFEditor
         private FastColoredTextBoxNS.FastColoredTextBox tbScript;
         private System.Windows.Forms.ToolStripMenuItem menuEditPSkill;
         private System.Windows.Forms.ToolStripMenuItem menuEditPSY;
-        private System.Windows.Forms.ContextMenuStrip menuAbotItem;
+        private System.Windows.Forms.ContextMenuStrip menuAboutItem;
         private System.Windows.Forms.ToolStripMenuItem menuAboutMain;
         private System.Windows.Forms.ToolStripMenuItem menuEditImport;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripMenuItem menuEditPEqu;
+        private System.Windows.Forms.ToolStripMenuItem menuFileExportPatchFile;
+        private System.Windows.Forms.ToolStripMenuItem menuHelp;
     }
 }

@@ -11,7 +11,7 @@ namespace PVFEditor.Services
     {
         static string m_tokenEndPoint = null;
         static HttpClient m_cli = null;
-
+        static string m_username = "";
         private static void Init()
         {
             var url_is = "https://pvf.kaho.tv:5000/";
@@ -44,6 +44,8 @@ namespace PVFEditor.Services
                     throw new Exception(resp.Error);
 
                 m_cli.SetBearerToken(resp.AccessToken);
+
+                m_username = name;
             }
         }
 
@@ -58,6 +60,11 @@ namespace PVFEditor.Services
         public static HttpClient GetHttpClient()
         {
             return m_cli;
+        }
+
+        public static string GetUserName()
+        {
+            return m_username;
         }
 
     }

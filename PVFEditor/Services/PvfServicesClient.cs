@@ -10,16 +10,32 @@ namespace PVFEditor.Services
 {
     public class PvfServicesClient
     {
+        static string addr = "https://pvf.kaho.tv:5002/";
         static PVFServices.Pvf.PvfClient m_cli = null;
 
-        public static void Init(HttpClient httpclient, Action<string> errcallback)
+        public static void Init(Action<string> errcallback, HttpClient httpclient = null)
         {
             if (m_cli == null)
             {
-                var channel = GrpcChannel.ForAddress("https://pvf.kaho.tv:5001/", new GrpcChannelOptions()
+                GrpcChannel channel = null;
+
+                if(httpclient != null)
                 {
-                    HttpClient = httpclient
-                });
+                    channel = GrpcChannel.ForAddress(addr, new GrpcChannelOptions()
+                    {
+                        HttpClient = httpclient,
+                        MaxSendMessageSize = 30 * 1024 * 1024,
+                        MaxReceiveMessageSize = 30 * 1024 * 1024
+                    });
+                }
+                else
+                {
+                    channel = GrpcChannel.ForAddress(addr, new GrpcChannelOptions() 
+                    {
+                        MaxSendMessageSize = 30 * 1024 * 1024,
+                        MaxReceiveMessageSize = 30 * 1024 * 1024
+                    });
+                }
 
                 var invoker = channel.Intercept(new ExceptionInterceptor(errcallback));
 
